@@ -8,6 +8,9 @@ authors = ["MajorX234 <majorx234@googlemail.com>"]
 name = "audio_lib"
 path = "src/lib.rs"
 
+[[bin]]
+name = "rust_wave_plotter"
+path = "src/main.rs"
 
 [dependencies]
 eframe = { version = "0.18.0"}
