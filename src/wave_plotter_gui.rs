@@ -5,7 +5,7 @@ use std::sync::Mutex;
 
 use egui::plot::{
     Arrows, Bar, BarChart, CoordinatesFormatter, Corner, GridInput, GridMark, HLine, Legend, Line,
-    LineStyle, MarkerShape, Plot, PlotImage, Points, Polygon, Text, VLine, Values,
+    LineStyle, MarkerShape, Plot, PlotImage, Points, Polygon, Text, VLine, Value, Values,
 };
 
 pub struct WavePlotterGui {
@@ -15,7 +15,7 @@ pub struct WavePlotterGui {
 impl Default for WavePlotterGui {
     fn default() -> Self {
         Self {
-            audiodata: Arc::new(Mutex::new(Audiodata::new(192000))),
+            audiodata: Arc::new(Mutex::new(Audiodata::new(192000, 128))),
         }
     }
 }
@@ -26,9 +26,18 @@ impl eframe::App for WavePlotterGui {
             ui.heading("WavePlotterGui");
             let plot = Plot::new("audio-signal");
             plot.show(ui, |plot_ui| {
-                plot_ui.points(Points::new(Values::from_ys_f32(
-                    &self.audiodata.lock().unwrap().get_values(),
-                )));
+                for (x, (min, max)) in self
+                    .audiodata
+                    .lock()
+                    .unwrap()
+                    .get_values()
+                    .into_iter()
+                    .enumerate()
+                {
+                    let p1 = Value::new(x as f64, min);
+                    let p2 = Value::new(x as f64, max);
+                    plot_ui.line(Line::new(Values::from_values(vec![p1, p2])));
+                }
             });
         });
     }

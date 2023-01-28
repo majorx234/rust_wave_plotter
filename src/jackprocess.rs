@@ -6,6 +6,7 @@ use std::sync::Mutex;
 use std::{thread, time::Duration};
 
 pub fn start_jack_thread(audiodata: Arc<Mutex<Audiodata>>) -> std::thread::JoinHandle<()> {
+    let chunk_size = audiodata.lock().unwrap().get_chunk_size();
     std::thread::spawn(move || {
         let mut run: bool = true;
         let (client, _status) =
@@ -25,8 +26,18 @@ pub fn start_jack_thread(audiodata: Arc<Mutex<Audiodata>>) -> std::thread::JoinH
             let in_a_p = in_a.as_slice(ps);
             let in_b_p = in_b.as_slice(ps);
 
-            for x in in_a_p.into_iter() {
-                audiodata.lock().unwrap().append(*x);
+            // ToDo: use ringbuffer instead of VecDeque with Mutex
+            for some_samples in in_a_p.chunks(chunk_size) {
+                let (mut max, mut min) = (some_samples[0], some_samples[0]);
+                for sample in some_samples {
+                    if *sample < min {
+                        min = *sample;
+                    }
+                    if *sample > max {
+                        max = *sample;
+                    }
+                    audiodata.lock().unwrap().append((min, max));
+                }
             }
 
             // in_b_p.into_iter().map(|x| audiodata.lock().append(*x));
