@@ -1,5 +1,7 @@
 use audio_lib::audiodata::Audiodata;
 use eframe::egui;
+use std::sync::Arc;
+use std::sync::Mutex;
 
 use egui::plot::{
     Arrows, Bar, BarChart, CoordinatesFormatter, Corner, GridInput, GridMark, HLine, Legend, Line,
@@ -7,13 +9,13 @@ use egui::plot::{
 };
 
 pub struct WavePlotterGui {
-    audiodata: Audiodata,
+    pub audiodata: Arc<Mutex<Audiodata>>,
 }
 
 impl Default for WavePlotterGui {
     fn default() -> Self {
         Self {
-            audiodata: Audiodata::new(192000),
+            audiodata: Arc::new(Mutex::new(Audiodata::new(192000))),
         }
     }
 }
