@@ -12,10 +12,18 @@ pub struct WavePlotterGui {
     pub audiodata: Arc<Mutex<Audiodata>>,
 }
 
+impl WavePlotterGui {
+    pub fn new(window_size: usize, chunk_size: usize) -> Self {
+        Self {
+            audiodata: Arc::new(Mutex::new(Audiodata::new(window_size, chunk_size))),
+        }
+    }
+}
+
 impl Default for WavePlotterGui {
     fn default() -> Self {
         Self {
-            audiodata: Arc::new(Mutex::new(Audiodata::new(192000, 128))),
+            audiodata: Arc::new(Mutex::new(Audiodata::new(192000, 512))),
         }
     }
 }
