@@ -55,5 +55,6 @@ impl eframe::App for WavePlotterGui {
                 }
             });
         });
+        ctx.request_repaint();
     }
 }
